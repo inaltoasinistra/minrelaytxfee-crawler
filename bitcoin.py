@@ -420,10 +420,10 @@ async def nodes_loop(routine_id: int) -> None:
     s = Storage()
     while True:
         addr_str, last_seen = s.last_seen_pop()
-        first_seen = s.first_seen_get(addr_str)
-        if not addr_str:
+        if addr_str is None:
             print('nodes_loop No addresses to explore')
             break
+        first_seen = s.first_seen_get(addr_str)
         h, p = host_port(addr_str)
         log_prefix = f'{char_id(routine_id)} {h:15}'
         print(log_prefix, readable_timestamp(first_seen)[:13], '→', readable_timestamp(last_seen)[:13])
@@ -441,5 +441,7 @@ async def nodes_loop(routine_id: int) -> None:
         s.first_seen_set(addr_ts)
 
 
-def readable_timestamp(timestamp: int) -> str:
+def readable_timestamp(timestamp: int | None) -> str:
+    if timestamp is None:
+        return 'no'
     return str(datetime.fromtimestamp(timestamp))

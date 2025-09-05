@@ -9,12 +9,13 @@ class Storage:
     def __init__(self):
         self.r = redis.Redis(host='localhost', port=6379 + 1000, decode_responses=True, db=0)
 
-    def last_seen_pop(self) -> tuple[str, int] | None:
+    def last_seen_pop(self) -> tuple[str | None, int]:
         el: list[tuple[str, float]] = self.r.zrevrange('last_seen', 0, 0, True)
         if el:
             addr_str, last_seen = el[0]
             self.r.zrem('last_seen', addr_str)
             return addr_str, int(last_seen)
+        return None, 0
 
     def last_seen_add(self, mapping: dict[str, int]) -> None:
         if mapping:
